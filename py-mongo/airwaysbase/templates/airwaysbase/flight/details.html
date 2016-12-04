@@ -1,0 +1,40 @@
+{% extends 'airwaysbase/base.html' %}
+{% load cusrom_filters %}
+
+{% block ext_links %}
+    {{ form.media }}
+{% endblock %}
+
+{% block content %}
+<div class="col-md-8 col-md-offset-2">
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <h3 class="panel-title">Flight</h3>
+        </div>
+        <div class="panel-body">
+            <h3>
+                {{ response.data.source.name }} ({{ response.data.source.country }})
+                -
+                {{ response.data.destination.name }} ({{ response.data.destination.country }})
+            </h3>
+            <div>
+                <strong>Airplane:</strong>
+                {{ response.data.aircraft.name }} (capacity : {{ response.data.aircraft.capacity }})
+            </div>
+            <div>
+                <strong>Starts at:</strong>
+                {{ response.data.start_date }}
+            </div>
+            <div>
+                <strong>Ends at:</strong>
+                {{ response.data.end_date }}
+            </div>
+            <br>
+            <div class="form-group">
+                <a href="/flights/{{ response.data|private_attr:'_id' }}/update" class="btn btn-success">Edit flight data</a>
+                <a href="/flights/{{ response.data|private_attr:'_id' }}/delete" class="btn btn-danger">Delete flight</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

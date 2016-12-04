@@ -1,0 +1,25 @@
+{% extends 'airwaysbase/base.html' %}
+{% load cusrom_filters %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <h3>Airplanes</h3>
+            <table class="table table-hover table-bordered">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Capacity</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for airplane in response.airplanes_list %}
+                    <tr>
+                        <td>{{ airplane.name }}</td>
+                        <td>{{ airplane.capacity }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

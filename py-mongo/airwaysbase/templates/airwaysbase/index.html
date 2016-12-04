@@ -1,0 +1,81 @@
+{% extends 'airwaysbase/base.html' %}
+{% load cusrom_filters %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Statistics</h3>
+        </div>
+        <div class="col-md-4">
+            <table class="table table-hover table-bordered">
+                <thead><tr>
+                    <th>From</th>
+                    <th>Flights num</th>
+                </tr></thead>
+                <tbody>
+                {% for row in response.stats.flights_from_airport %}
+                    <tr>
+                        <td>{{ row.from }}</td>
+                        <td>{{ row.flights_num }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-4">
+            <table class="table table-hover table-bordered">
+                <thead><tr>
+                    <th>To</th>
+                    <th>Flights num</th>
+                </tr></thead>
+                <tbody>
+                {% for row in response.stats.flights_to_airport %}
+                    <tr>
+                        <td>{{ row.to }}</td>
+                        <td>{{ row.flights_num }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-4">
+            <table class="table table-hover table-bordered">
+                <thead><tr>
+                    <th>From</th>
+                    <th>Flights num</th>
+                </tr></thead>
+                <tbody>
+                {% for row in response.stats.flights_per_aircraft %}
+                    <tr>
+                        <td>{{ row.name }}</td>
+                        <td>{{ row.flights_num }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <h3>Recent flights (TOP-10)</h3>
+            <table class="table table-hover table-bordered">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>Starts at</th>
+                    <th>From</th>
+                    <th>To</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for flight in response.flights_list_limited %}
+                    <tr>
+                        <td><a href="/flights/{{ flight|private_attr:'_id' }}">Details</a></td>
+                        <td>{{ flight.start_date }}</td>
+                        <td>{{ flight.source.name }}</td>
+                        <td>{{ flight.destination.name }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

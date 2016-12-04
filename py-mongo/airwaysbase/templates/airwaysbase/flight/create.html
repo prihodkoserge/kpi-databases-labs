@@ -1,0 +1,50 @@
+{% extends 'airwaysbase/base.html' %}
+{% load cusrom_filters %}
+
+{% block ext_links %}
+    {{ form.media }}
+{% endblock %}
+
+{% block content %}
+<div class="col-md-8 col-md-offset-2">
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <h3 class="panel-title">Create flight</h3>
+        </div>
+        <div class="panel-body">
+            <form class="form" action="" method="POST">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                <div class="form-group">
+                    {{ form.source_id.errors }}
+                    <label for="{{ form.source_id.id_for_label }}" class="control-label">Source</label>
+                    {{ form.source_id | add_css_class:'form-control' }}
+                </div>
+                <div class="form-group">
+                    {{ form.destination_id.errors }}
+                    <label for="{{ form.destination_id.id_for_label }}" class="control-label">Destination</label>
+                    {{ form.destination_id | add_css_class:'form-control' }}
+                </div>
+                <div class="form-group">
+                    {{ form.aircarft_id.errors }}
+                    <label for="{{ form.aircraft_id.id_for_label }}" class="control-label">Airplane</label>
+                    {{ form.aircraft_id | add_css_class:'form-control' }}
+                </div>
+                <div class="form-group">
+                    {{ form.start_date.errors }}
+                    <label for="{{ form.start_date.id_for_label }}" class="control-label">Starts at</label>
+                    {{ form.start_date | add_css_class:'form-control' }}
+                </div>
+                <div class="form-group">
+                    {{ form.end_date.errors }}
+                    <label for="{{ form.end_date.id_for_label }}" class="control-label">Ends at</label>
+                    {{ form.end_date | add_css_class:'form-control' }}
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-success" type="submit">Create new flight</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
