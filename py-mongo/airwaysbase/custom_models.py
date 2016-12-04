@@ -85,6 +85,7 @@ class Flight(object):
         self.aircraft_id = attr_list.get('aircraft_id', None)
         self.start_date = attr_list.get('start_date', None)
         self.end_date = attr_list.get('end_date', None)
+        self.cancelled = attr_list.get('cancelled', False)
 
     def update(self, new_data):
         db.instance.Flight.update(
@@ -138,6 +139,8 @@ class Flight(object):
             d['start_date'] = self.start_date
         if self.end_date is not None:
             d['end_date'] = self.end_date
+        if self.cancelled is not None:
+            d['cancelled'] = self.cancelled
 
         return d
 
@@ -215,4 +218,3 @@ class Stat(object):
                 'flights_num': int(pair['value'])
             })
         return res
-    

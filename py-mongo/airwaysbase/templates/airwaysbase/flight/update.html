@@ -41,6 +41,10 @@
                     {{ form.end_date | add_css_class:'form-control' }}
                 </div>
                 <div class="form-group">
+                    {{ form.cancelled }}
+                    <label for="{{ form.cancelled.id_for_label }}" class="control-label">Cancelled?</label>
+                </div>
+                <div class="form-group">
                     <button class="btn btn-success" type="submit">Update</button>
                 </div>
             </form>

@@ -29,6 +29,11 @@
                 <strong>Ends at:</strong>
                 {{ response.data.end_date }}
             </div>
+            {% if response.data.cancelled %}
+            <div>
+                <strong class="text-danger">Flight was cancelled!</strong>
+            </div>
+            {% endif %}
             <br>
             <div class="form-group">
                 <a href="/flights/{{ response.data|private_attr:'_id' }}/update" class="btn btn-success">Edit flight data</a>

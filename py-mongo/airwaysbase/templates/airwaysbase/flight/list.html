@@ -15,9 +15,14 @@
                 </thead>
                 <tbody>
                 {% for flight in response.flights %}
-                    <tr>
+                    <tr class="{% if flight.cancelled %}danger{%endif%}">
                         <td><a href="/flights/{{ flight|private_attr:'_id' }}">Details</a></td>
-                        <td>{{ flight.start_date }}</td>
+                        <td>
+                            {{ flight.start_date }}
+                            {% if flight.cancelled %}
+                                <strong class="text-danger">Cancelled</strong>
+                            {% endif %}
+                        </td>
                         <td>{{ flight.source.name }}</td>
                         <td>{{ flight.destination.name }}</td>
                     </tr>

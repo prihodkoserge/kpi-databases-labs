@@ -11,3 +11,4 @@ class NewFlightForm(forms.Form):
         attrs={'id':'start_date'}, usel10n=True, bootstrap_version=3))
     end_date = forms.DateTimeField(widget=DateTimeWidget(
         attrs={'id': 'end_date'}, usel10n=True, bootstrap_version=3))
+    cancelled = forms.BooleanField(required=False, label='Cancelled?')
