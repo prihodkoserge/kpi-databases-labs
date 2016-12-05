@@ -2,20 +2,44 @@
 {% load cusrom_filters %}
 {% block content %}
     <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <h3>Recent flights (TOP-10)</h3>
+            <table class="table table-hover table-bordered">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>Starts at</th>
+                    <th>From</th>
+                    <th>To</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for flight in response.flights_list_limited %}
+                    <tr>
+                        <td><a href="/flights/{{ flight|private_attr:'_id' }}">Details</a></td>
+                        <td>{{ flight.start_date }}</td>
+                        <td>{{ flight.source.name }}</td>
+                        <td>{{ flight.destination.name }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
         <div class="col-md-12">
             <h3>Statistics</h3>
         </div>
         <div class="col-md-4">
             <table class="table table-hover table-bordered">
                 <thead><tr>
-                    <th>From</th>
-                    <th>Flights num</th>
+                    <th>Most cancellation airport</th>
+                    <th>Cancelled flights</th>
                 </tr></thead>
                 <tbody>
-                {% for row in response.stats.flights_from_airport %}
+                {% for row in response.stats.most_cancellation_airports %}
                     <tr>
-                        <td>{{ row.from }}</td>
-                        <td>{{ row.flights_num }}</td>
+                        <td>{{ row.name }}</td>
+                        <td>{{ row.count }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -48,30 +72,6 @@
                     <tr>
                         <td>{{ row.name }}</td>
                         <td>{{ row.flights_num }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <div class="col-md-12 col-sm-12 col-xs-12">
-            <h3>Recent flights (TOP-10)</h3>
-            <table class="table table-hover table-bordered">
-                <thead>
-                <tr>
-                    <th></th>
-                    <th>Starts at</th>
-                    <th>From</th>
-                    <th>To</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for flight in response.flights_list_limited %}
-                    <tr>
-                        <td><a href="/flights/{{ flight|private_attr:'_id' }}">Details</a></td>
-                        <td>{{ flight.start_date }}</td>
-                        <td>{{ flight.source.name }}</td>
-                        <td>{{ flight.destination.name }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>

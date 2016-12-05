@@ -245,4 +245,16 @@ class Stat(object):
             })
         return res
 
-Stat.flights_per_aircraft()
+    @staticmethod
+    def most_cancellation_airports():
+        raw = db.instance.Flight.aggregate([
+            {'$match': {'cancelled': True }},
+            {'$group': {'_id':  '$source', 'count': {'$sum': 1}}},
+            {'$sort': {'count': -1}}
+        ])
+        agg = list(raw)
+        for obj in agg:
+            obj['name'] = obj['_id']['name']
+        return agg
+
+print Stat.most_cancellation_airports()

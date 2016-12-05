@@ -15,7 +15,8 @@ def index(request):
     stats = {
         'flights_from_airport': Stat.flights_from_airport(),
         'flights_to_airport': Stat.flights_to_airport(),
-        'flights_per_aircraft': Stat.flights_per_aircraft()
+        'flights_per_aircraft': Stat.flights_per_aircraft(),
+        'most_cancellation_airports': Stat.most_cancellation_airports()
     }
     flights = Flight.get_list(10)
 
