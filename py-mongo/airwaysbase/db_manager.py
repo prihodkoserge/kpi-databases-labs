@@ -5,12 +5,12 @@ class DB:
     def __init__(self):
         self.client = MongoClient()
         self.instance = self.client.aw_base
+        # self.instance.Flight.remove({})
         # self.force_fill_db()
 
     def force_fill_db(self):
         self.instance.Aircraft.remove({})
         self.instance.Airport.remove({})
-        self.instance.Flight.remove({})
 
         aircraft1 = { 'name': 'Boing 1', 'capacity': 1000 }
         aircraft2 = { 'name': 'Boing 2', 'capacity': 3000 }

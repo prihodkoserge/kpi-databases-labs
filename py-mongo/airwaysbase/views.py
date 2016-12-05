@@ -1,4 +1,5 @@
 from datetime import datetime
+from pymongo.database import DBRef
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, HttpResponseRedirect, redirect
 from .forms import NewFlightForm
@@ -14,24 +15,37 @@ def index(request):
     stats = {
         'flights_from_airport': Stat.flights_from_airport(),
         'flights_to_airport': Stat.flights_to_airport(),
-        'flights_per_aircraft': Stat.flights_per_aircraft()
+        'flights_per_aircraft': Stat.flights_per_aircraft(),
+        'most_cancellation_airports': Stat.most_cancellation_airports()
     }
     flights = Flight.get_list(10)
-    return render(request, 'airwaysbase/index.html', {'response': {
-        'stats': stats,
-        'flights_list_limited': flights
-    }})
+
+    return render(request, 'airwaysbase/index.html', {
+        'response': {
+            'stats': stats,
+            'flights_list_limited': flights
+        }
+    })
 
 
 def flights_list(request):
-    return render(request, 'airwaysbase/flight/list.html', {'response': {
-        'flights': Flight.get_list()
-    }})
+    return render(request, 'airwaysbase/flight/list.html', {
+        'response': {
+            'flights': Flight.get_list()
+        }
+    })
 
 
 def view_flight(request, flight_id):
-    flight_data = Flight.get_by_id(flight_id).expanded_dict()
-    return render(request, 'airwaysbase/flight/details.html', { 'response': {'data': flight_data}})
+    flight_data = Flight\
+        .get_by_id(flight_id)\
+        .to_dict()
+
+    return render(request, 'airwaysbase/flight/details.html', {
+        'response': {
+            'data': flight_data
+        }
+    })
 
 
 def create_flight(request):
@@ -45,7 +59,8 @@ def create_flight(request):
         form = NewFlightForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
-            db.instance.Flight.insert_one(data)
+            new_flight = Flight(data, from_form=True)
+            new_flight.save()
             return HttpResponseRedirect('/')
 
 
@@ -56,13 +71,7 @@ def delete_flight(request, flight_id):
 
 def update_flight(request, flight_id):
     flight = Flight.get_by_id(flight_id)
-
-    if request.method == 'GET':
-        return render(request, 'airwaysbase/flight/update.html', {
-            'airports': Airport.get_list(),
-            'airplanes': Aircraft.get_list(),
-            'form': NewFlightForm(flight.to_dict())
-        })
+    errors = None
     if request.method == 'POST':
         form = NewFlightForm(request.POST)
         if form.is_valid():
@@ -70,6 +79,15 @@ def update_flight(request, flight_id):
             flight.update(updated_data)
             redirect_url = reverse('view_flight', kwargs={'flight_id': flight.id})
             return redirect(redirect_url)
+        else:
+            errors = 'Please, fill form fields correctly!'
+
+    return render(request, 'airwaysbase/flight/update.html', {
+        'airports': Airport.get_list(),
+        'airplanes': Aircraft.get_list(),
+        'form': NewFlightForm(flight.to_form_data()),
+        'errors': errors
+    })
 
 
 def airplanes_list(request):

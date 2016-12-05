@@ -16,19 +16,19 @@
                 {% csrf_token %}
                 {{ form.non_field_errors }}
                 <div class="form-group">
-                    {{ form.source_id.errors }}
-                    <label for="{{ form.source_id.id_for_label }}" class="control-label">Source</label>
-                    {{ form.source_id | add_css_class:'form-control' }}
+                    {{ form.source.errors }}
+                    <label for="{{ form.source.id_for_label }}" class="control-label">Source</label>
+                    {{ form.source | add_css_class:'form-control' }}
                 </div>
                 <div class="form-group">
-                    {{ form.destination_id.errors }}
-                    <label for="{{ form.destination_id.id_for_label }}" class="control-label">Destination</label>
-                    {{ form.destination_id | add_css_class:'form-control' }}
+                    {{ form.destination.errors }}
+                    <label for="{{ form.destination.id_for_label }}" class="control-label">Destination</label>
+                    {{ form.destination | add_css_class:'form-control' }}
                 </div>
                 <div class="form-group">
-                    {{ form.aircarft_id.errors }}
-                    <label for="{{ form.aircraft_id.id_for_label }}" class="control-label">Airplane</label>
-                    {{ form.aircraft_id | add_css_class:'form-control' }}
+                    {{ form.aircarft.errors }}
+                    <label for="{{ form.aircraft.id_for_label }}" class="control-label">Airplane</label>
+                    {{ form.aircraft | add_css_class:'form-control' }}
                 </div>
                 <div class="form-group">
                     {{ form.start_date.errors }}

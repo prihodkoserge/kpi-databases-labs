@@ -14,7 +14,7 @@ class Aircraft(object):
     @staticmethod
     def get_list():
         cursor = db.instance.Aircraft.find()
-        return [a for a in cursor]
+        return [Aircraft(a).to_dict() for a in cursor]
 
     @staticmethod
     def get_choices():
@@ -45,12 +45,13 @@ class Airport(object):
     def __init__(self, attr_list={}):
         self.id = attr_list.get('_id', None)
         self.name = attr_list.get('name', '')
+        self.city = attr_list.get('city', '')
         self.country = attr_list.get('country', '')
 
     @staticmethod
     def get_list():
         cursor = db.instance.Airport.find()
-        return [a for a in cursor]
+        return [Airport(a).to_dict() for a in cursor]
 
     @staticmethod
     def get_choices():
@@ -68,6 +69,8 @@ class Airport(object):
             d['_id'] = self.id
         if self.name != '':
             d['name'] = self.name
+        if self.city != '':
+            d['city'] = self.city
         if self.country != '':
             d['country'] = self.country
 
@@ -78,16 +81,24 @@ class Airport(object):
 
 
 class Flight(object):
-    def __init__(self, attr_list={}):
+    def __init__(self, attr_list={}, from_form=False):
+        if from_form is not False:
+            attr_list = Flight.__prepare_form_data(attr_list)
+
         self.id = attr_list.get('_id', None)
-        self.source_id = attr_list.get('source_id', None)
-        self.destination_id = attr_list.get('destination_id', None)
-        self.aircraft_id = attr_list.get('aircraft_id', None)
+        self.source = Airport(attr_list.get('source', {}))
+        self.destination = Airport(attr_list.get('destination', {}))
+        self.aircraft = Aircraft(attr_list.get('aircraft', {}))
         self.start_date = attr_list.get('start_date', None)
         self.end_date = attr_list.get('end_date', None)
         self.cancelled = attr_list.get('cancelled', False)
 
+    def save(self):
+        db.instance.Flight.insert(self.to_dict())
+
     def update(self, new_data):
+        new_data = Flight.__prepare_form_data(new_data)
+
         db.instance.Flight.update(
             {'_id': self.id},
             {
@@ -95,12 +106,40 @@ class Flight(object):
             }
         )
 
+    def to_form_data(self):
+        d = self.to_dict()
+
+        if d['source'] is not None:
+            d['source'] = d['source']['_id']
+        if d['destination'] is not None:
+            d['destination'] = d['destination']['_id']
+        if d['aircraft'] is not None:
+            d['aircraft'] = d['aircraft']['_id']
+
+        return d
+
+    @staticmethod
+    def __prepare_form_data(form_data):
+        if form_data['source'] is not None:
+            form_data['source'] = Airport\
+                .get_by_id(form_data['source'])\
+                .to_dict()
+        if form_data['destination'] is not None:
+            form_data['destination'] = Airport\
+                .get_by_id(form_data['destination'])\
+                .to_dict()
+        if form_data['aircraft'] is not None:
+            form_data['aircraft'] = Aircraft\
+                .get_by_id(form_data['aircraft'])\
+                .to_dict()
+        return form_data
+
     @staticmethod
     def get_list(limit=None):
         cursor = db.instance.Flight.find()
         if limit is not None:
             cursor.limit(limit=limit)
-        return [Flight(f).expanded_dict() for f in cursor]
+        return [Flight(f).to_dict() for f in cursor]
 
     @staticmethod
     def get_by_id(id):
@@ -112,35 +151,22 @@ class Flight(object):
         id = ObjectId(id)
         db.instance.Flight.remove({'_id': id})
 
-    def expanded_dict(self):
-        d = self.to_dict()
-
-        if self.source_id is not None:
-            d['source'] = Airport.get_by_id(self.source_id)
-        if self.destination_id is not None:
-            d['destination'] = Airport.get_by_id(self.destination_id)
-        if self.aircraft_id is not None:
-            d['aircraft'] = Aircraft.get_by_id(self.aircraft_id)
-
-        return d
-
     def to_dict(self):
         d = {}
 
         if self.id is not None:
             d['_id'] = self.id
-        if self.source_id is not None:
-            d['source_id'] = self.source_id
-        if self.destination_id is not None:
-            d['destination_id'] = self.destination_id
-        if self.aircraft_id is not None:
-            d['aircraft_id'] = self.aircraft_id
+        if self.source is not None:
+            d['source'] = self.source.to_dict()
+        if self.destination is not None:
+            d['destination'] = self.destination.to_dict()
+        if self.aircraft is not None:
+            d['aircraft'] = self.aircraft.to_dict()
         if self.start_date is not None:
             d['start_date'] = self.start_date
         if self.end_date is not None:
             d['end_date'] = self.end_date
-        if self.cancelled is not None:
-            d['cancelled'] = self.cancelled
+        d['cancelled']  = self.cancelled
 
         return d
 
@@ -151,7 +177,7 @@ class Stat(object):
     def flights_per_aircraft():
         mapper = Code("""
             function(){
-                emit(this.aircraft_id, 1);
+                emit(this.aircraft._id, 1);
             }
         """)
         reducer = Code("""
@@ -175,7 +201,7 @@ class Stat(object):
     def flights_from_airport():
         mapper = Code("""
             function(){
-                emit(this.source_id, 1);
+                emit(this.source._id, 1);
             }
         """)
         reducer = Code("""
@@ -199,7 +225,7 @@ class Stat(object):
     def flights_to_airport():
         mapper = Code("""
             function(){
-                emit(this.destination_id, 1);
+                emit(this.destination._id, 1);
             }
         """)
         reducer = Code("""
@@ -218,3 +244,17 @@ class Stat(object):
                 'flights_num': int(pair['value'])
             })
         return res
+
+    @staticmethod
+    def most_cancellation_airports():
+        raw = db.instance.Flight.aggregate([
+            {'$match': {'cancelled': True }},
+            {'$group': {'_id':  '$source', 'count': {'$sum': 1}}},
+            {'$sort': {'count': -1}}
+        ])
+        agg = list(raw)
+        for obj in agg:
+            obj['name'] = obj['_id']['name']
+        return agg
+
+print Stat.most_cancellation_airports()
