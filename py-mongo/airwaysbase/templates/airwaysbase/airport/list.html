@@ -1,6 +1,18 @@
 {% extends 'airwaysbase/base.html' %}
 {% load cusrom_filters %}
+
 {% block content %}
+    <div class="row">
+        <div class="col-sm-12">
+            <form class="form" action="" method="POST">
+                {% csrf_token %}
+                {{ response.form.as_p }}
+                <div class="form-group">
+                    <button class="btn btn-success" type="submit">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12">
             <h3>Airports</h3>

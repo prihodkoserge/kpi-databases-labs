@@ -1,7 +1,10 @@
 from .db_manager import DB
 from bson.objectid import ObjectId
 from bson.code import Code
+from cache_manager import CacheManager
+from datetime import datetime
 
+cache = CacheManager()
 db = DB()
 
 
@@ -47,6 +50,27 @@ class Airport(object):
         self.name = attr_list.get('name', '')
         self.city = attr_list.get('city', '')
         self.country = attr_list.get('country', '')
+
+    @staticmethod
+    def search(keyword):
+        t0 = datetime.now()
+        cached_result = cache.get_from_cache(keyword)
+        t0 = datetime.now() - t0
+        if not cached_result:
+            t1 = datetime.now()
+            cursor = db.instance.Airport.find({'$text': {'$search': keyword}})
+            t1 = datetime.now() - t1
+            airports = [Airport(a).to_dict() for a in cursor]
+            print 'Loaded from mongo: ', t1
+            if airports:
+                cache.cache_data(keyword, airports)
+                return airports
+            else:
+                return []
+        else:
+            print 'Loaded from cache: ', t0
+            return cached_result
+
 
     @staticmethod
     def get_list():

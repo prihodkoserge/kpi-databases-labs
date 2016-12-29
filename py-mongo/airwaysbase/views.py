@@ -2,7 +2,7 @@ from datetime import datetime
 from pymongo.database import DBRef
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, HttpResponseRedirect, redirect
-from .forms import NewFlightForm
+from .forms import NewFlightForm, SearchForm
 from .db_manager import DB
 from .custom_models import *
 
@@ -97,6 +97,16 @@ def airplanes_list(request):
 
 
 def airports_list(request):
+    if request.method == 'POST':
+        form = SearchForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            return render(request, 'airwaysbase/airport/list.html', {'response': {
+                'airports_list': Airport.search(data['search']),
+                'form': form
+            }})
+    form = SearchForm()
     return render(request, 'airwaysbase/airport/list.html', {'response': {
-        'airports_list': Airport.get_list()
+        'airports_list': Airport.get_list(),
+        'form': form
     }})

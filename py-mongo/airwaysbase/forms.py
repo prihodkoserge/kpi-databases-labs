@@ -3,6 +3,10 @@ from datetimewidget.widgets import DateTimeWidget
 from .custom_models import Aircraft, Airport
 
 
+class SearchForm(forms.Form):
+    search = forms.CharField(max_length=50)
+
+
 class NewFlightForm(forms.Form):
     source = forms.ChoiceField(label='Source', choices=Airport.get_choices())
     destination = forms.ChoiceField(label='Destination', choices=Airport.get_choices())
